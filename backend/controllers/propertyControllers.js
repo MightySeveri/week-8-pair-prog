@@ -40,6 +40,30 @@ const createProperty = async (req, res) => {
   }
 };
 
+// PUT /api/properties/:propertyId
+const updateProperty = async (req, res) => {
+  const { propertyId } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(propertyId)) {
+    return res.status(400).json({ message: "Invalid property ID" });
+  }
+
+  try {
+    const updatedProperty = await Property.findByIdAndUpdate(propertyId, req.body, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!updatedProperty) {
+      return res.status(404).json({ message: "property not found" });
+    }
+
+    res.status(200).json(updatedProperty);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to update property" });
+  }
+};
+
 // DELETE /api/properties/:propertyId
 const deleteProperty = async (req, res) => {
   const { propertyId } = req.params;
@@ -63,5 +87,6 @@ module.exports = {
   getAllProperties,
   getPropertyById,
   createProperty,
+  updateProperty,
   deleteProperty,
 };

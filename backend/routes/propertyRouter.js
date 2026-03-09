@@ -4,6 +4,7 @@ const {
   getAllProperties,
   getPropertyById,
   createProperty,
+  updateProperty,
   deleteProperty,
 } = require("../controllers/propertyControllers");
 
@@ -15,6 +16,9 @@ router.get("/:propertyId", getPropertyById);
 
 // POST /api/properties
 router.post("/", createProperty);
+
+// PUT /api/properties/:propertyId
+router.put("/:propertyId", updateProperty);
 
 // DELETE /api/properties/:propertyId
 router.delete("/:propertyId", deleteProperty);
