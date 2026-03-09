@@ -41,9 +41,7 @@ const App = () => {
               path="/properties/:id"
               element={<PropertyPage isAuthenticated={isAuthenticated} />}
             />
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
-                      <Route
+            <Route
               path="/login"
               element={
                 isAuthenticated ? (
@@ -63,6 +61,8 @@ const App = () => {
                 )
               }
             />
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
         </div>
       </BrowserRouter>
     </div>
