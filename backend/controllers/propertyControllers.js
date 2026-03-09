@@ -40,8 +40,28 @@ const createProperty = async (req, res) => {
   }
 };
 
+// DELETE /api/properties/:propertyId
+const deleteProperty = async (req, res) => {
+  const { propertyId } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(propertyId)) {
+    return res.status(400).json({ message: "Invalid property ID" });
+  }
+
+  try {
+    const deletedProperty = await Property.findByIdAndDelete(propertyId);
+    if (!deletedProperty) {
+      return res.status(404).json({ message: "property not found" });
+    }
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ message: "Failed to delete property" });
+  }
+};
+
 module.exports = {
   getAllProperties,
   getPropertyById,
   createProperty,
+  deleteProperty,
 };
