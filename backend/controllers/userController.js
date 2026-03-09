@@ -6,7 +6,13 @@ const generateToken = (_id) => jwt.sign({ _id }, process.env.SECRET, { expiresIn
 
 // POST /api/users/signup
 const signupUser = async (req, res) => {
-  const { fullName, email, password, phoneNumber, gender, date_of_birth, accountType } = req.body;
+  const fullName = req.body.fullName || req.body.name;
+  const email = req.body.email;
+  const password = req.body.password;
+  const phoneNumber = req.body.phoneNumber || req.body.phone_number;
+  const gender = req.body.gender;
+  const date_of_birth = req.body.date_of_birth;
+  const accountType = req.body.accountType || req.body.membership_status;
 
   try {
     if (!fullName || !email || !password || !phoneNumber || !gender || !date_of_birth || !accountType) {
@@ -41,6 +47,33 @@ const signupUser = async (req, res) => {
   }
 };
 
+// POST /api/users/login
+const loginUser = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    if (!email || !password) {
+      return res.status(400).json({ error: "All fields must be filled" });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ error: "Invalid credentials" });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ error: "Invalid credentials" });
+    }
+
+    const token = generateToken(user._id);
+    res.status(200).json({ email: user.email, token });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
 module.exports = {
   signupUser,
+  loginUser,
 };
