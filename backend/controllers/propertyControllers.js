@@ -4,7 +4,7 @@ const Property = require("../models/propertyModel");
 // GET /api/properties
 const getAllProperties = async (req, res) => {
   try {
-    const properties = await Property.find({});
+    const properties = await Property.find({}).sort({ createdAt: -1 });
     res.status(200).json(properties);
   } catch (error) {
     res.status(500).json({ message: "Failed to retrieve properties" });
@@ -33,7 +33,7 @@ const getPropertyById = async (req, res) => {
 // POST /api/properties
 const createProperty = async (req, res) => {
   try {
-    const newProperty = await Property.create(req.body);
+    const newProperty = await Property.create({ ...req.body, user_id: req.user._id });
     res.status(201).json(newProperty);
   } catch (error) {
     res.status(400).json({ message: "Failed to create property", error: error.message });
@@ -49,10 +49,11 @@ const updateProperty = async (req, res) => {
   }
 
   try {
-    const updatedProperty = await Property.findByIdAndUpdate(propertyId, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const updatedProperty = await Property.findOneAndUpdate(
+      { _id: propertyId, user_id: req.user._id },
+      { ...req.body },
+      { new: true, runValidators: true }
+    );
 
     if (!updatedProperty) {
       return res.status(404).json({ message: "property not found" });
@@ -73,10 +74,15 @@ const deleteProperty = async (req, res) => {
   }
 
   try {
-    const deletedProperty = await Property.findByIdAndDelete(propertyId);
+    const deletedProperty = await Property.findOneAndDelete({
+      _id: propertyId,
+      user_id: req.user._id,
+    });
+
     if (!deletedProperty) {
       return res.status(404).json({ message: "property not found" });
     }
+
     res.status(204).send();
   } catch (error) {
     res.status(500).json({ message: "Failed to delete property" });

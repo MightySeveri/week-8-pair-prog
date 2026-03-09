@@ -7,6 +7,10 @@ const {
   updateProperty,
   deleteProperty,
 } = require("../controllers/propertyControllers");
+const requireAuth = require("../middleware/requireAuth");
+
+// protect all property routes
+router.use(requireAuth);
 
 // GET /api/properties
 router.get("/", getAllProperties);
